@@ -41,13 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="MessageParser.cs" />
+    <Compile Include="DiceCommandParser.cs" />
+    <Compile Include="RequestCommand.cs" />
+    <Compile Include="RequestCommandParser.cs" />
     <Compile Include="RollGenerator.cs" />
     <Compile Include="DiceCommand.cs" />
     <Compile Include="DiceResults.cs" />
-    <Compile Include="RollOutputGenerator.cs" />
+    <Compile Include="DiceOutputGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestOutputGenerator.cs" />
     <Compile Include="TotalScoreGenerator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

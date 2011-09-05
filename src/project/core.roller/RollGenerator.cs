@@ -6,12 +6,20 @@ namespace core.roller
     {
         private Random randomizer = new Random();
 
+        public string GenerateRollString(DiceCommand command)
+        {
+            return string.Format("{0}d{1}{2}{3}", command.Dice, command.Sides, 
+                                                  (command.Bonus > 0) ? "+" : "",
+                                                  (command.Bonus != 0) ? command.Bonus.ToString() : "");
+        }
+
         public DiceResults GenerateRollResults(DiceCommand command)
         {
             var diceResults = new DiceResults()
             {                                      
                 Roller = command.Roller,
-                Bonus = command.Bonus
+                Bonus = command.Bonus,
+                OriginalRoll = GenerateRollString(command)
             };
 
             for(var i=0;i<command.Dice;i++)

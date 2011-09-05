@@ -4,6 +4,7 @@ namespace core.roller
 {
     public class DiceResults
     {
+        public string OriginalRoll { get; set; }
         public string Roller { get; set; }
         public IList<int> Rolls { get; set; }
         public int Bonus { get; set; }

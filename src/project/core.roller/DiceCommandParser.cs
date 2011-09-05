@@ -1,9 +1,14 @@
+using System;
+using System.Text.RegularExpressions;
+
 namespace core.roller
 {
-    public class MessageParser
+    public class DiceCommandParser
     {
-        public bool IsValidRollCommand(string message)
-        { return (message.Substring(0, 2) == "//") && (message.Contains("d")); }
+        private const string PatternMatcher = @"/{2}[0-9\s]*d[0-9\s]*";
+
+        public bool IsMatchingCommand(string message)
+        { return Regex.IsMatch(message, PatternMatcher, RegexOptions.IgnoreCase); }
 
         private bool HasBonusInCommand(string formattedCommand)
         { return (formattedCommand.Contains("+") || formattedCommand.Contains("-")); }

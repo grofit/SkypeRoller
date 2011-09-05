@@ -14,15 +14,21 @@ namespace SkypeRoller
 
         private Skype skype;
 
-        private RollOutputGenerator rollOutputGenerator;
+        private DiceOutputGenerator diceOutputGenerator;
         private RollGenerator rollGenerator;
-        private MessageParser messageParser;
+        private DiceCommandParser diceCommandParser;
+
+        private RequestOutputGenerator requestOutputGenerator;
+        private RequestCommandParser requestCommandParser;
 
         public SkypeMediator()
         {
-            rollOutputGenerator = new RollOutputGenerator(new TotalScoreGenerator());
+            diceOutputGenerator = new DiceOutputGenerator(new TotalScoreGenerator());
             rollGenerator = new RollGenerator();
-            messageParser = new MessageParser();
+            diceCommandParser = new DiceCommandParser();
+
+            requestOutputGenerator = new RequestOutputGenerator();
+            requestCommandParser = new RequestCommandParser();
 
             CreateBindingCheckTimer();
         }
@@ -57,12 +63,29 @@ namespace SkypeRoller
         {
             if (status == TChatMessageStatus.cmsSending)
             {
-                if (messageParser.IsValidRollCommand(message.Body))
+                if (diceCommandParser.IsMatchingCommand(message.Body))
                 {
-                    var diceCommand = messageParser.ParseCommandFromMessage(message.Body, message.FromDisplayName);
+                    var diceCommand = diceCommandParser.ParseCommandFromMessage(message.Body, message.FromDisplayName);
                     var diceResults = rollGenerator.GenerateRollResults(diceCommand);
-                    var outputMessage = rollOutputGenerator.GenerateOutputMessage(diceResults);
+                    var outputMessage = diceOutputGenerator.GenerateOutputMessage(diceResults);
                     message.Chat.SendMessage(outputMessage);
+                }
+
+                if (requestCommandParser.IsMatchingCommand(message.Body))
+                {
+                    var requestCommand = requestCommandParser.ParseCommandFromMessage(message.Body, message.FromDisplayName);
+                    var outputMessage = requestOutputGenerator.GenerateOutputMessage(requestCommand);
+                    Program.RollerTrayForm.DisplayInfoMessage("Interaction Requested", outputMessage);
+                }
+            }
+            
+            if(status == TChatMessageStatus.cmsReceived)
+            {
+                if(requestCommandParser.IsMatchingCommand(message.Body))
+                {
+                    var requestCommand = requestCommandParser.ParseCommandFromMessage(message.Body, message.FromDisplayName);
+                    var outputMessage = requestOutputGenerator.GenerateOutputMessage(requestCommand);
+                    Program.RollerTrayForm.DisplayInfoMessage("Interaction Requested", outputMessage);
                 }
             }
         }

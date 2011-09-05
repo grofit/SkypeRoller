@@ -3,21 +3,21 @@ using System.Text;
 
 namespace core.roller
 {
-    public class RollOutputGenerator
+    public class DiceOutputGenerator
     {
         private TotalScoreGenerator totalScoreGenerator;
 
-        public RollOutputGenerator(TotalScoreGenerator totalScoreGenerator)
+        public DiceOutputGenerator(TotalScoreGenerator totalScoreGenerator)
         {
             this.totalScoreGenerator = totalScoreGenerator;
         }
-
+        
         public string GenerateOutputMessage(DiceResults diceResult)
         {
             var totalScore = totalScoreGenerator.GenerateTotalScore(diceResult);
             var outputMessage = new StringBuilder();
 
-            outputMessage.AppendFormat("{0} rolled {1}{2}", diceResult.Roller, totalScore, Environment.NewLine);
+            outputMessage.AppendFormat("{0} rolled ({1}) yielding {2}{3}", diceResult.Roller, diceResult.OriginalRoll, totalScore, Environment.NewLine);
             outputMessage.AppendFormat("- Consisting of ");
             foreach(var roll in diceResult.Rolls) { outputMessage.AppendFormat("{0} ", roll); }
 

@@ -42,6 +42,11 @@ namespace SkypeRoller
                 ToolTipIcon.Warning);
         }
 
+        public void DisplayInfoMessage(string title, string message)
+        {
+            trayIcon.ShowBalloonTip(FiveSeconds, title, message, ToolTipIcon.Info);
+        }
+
         protected void CreateTrayMenu()
         {
             trayMenu = new ContextMenu();
