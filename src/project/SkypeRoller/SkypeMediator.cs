@@ -70,13 +70,6 @@ namespace SkypeRoller
                     var outputMessage = diceOutputGenerator.GenerateOutputMessage(diceResults);
                     message.Chat.SendMessage(outputMessage);
                 }
-
-                if (requestCommandParser.IsMatchingCommand(message.Body))
-                {
-                    var requestCommand = requestCommandParser.ParseCommandFromMessage(message.Body, message.FromDisplayName);
-                    var outputMessage = requestOutputGenerator.GenerateOutputMessage(requestCommand);
-                    Program.RollerTrayForm.DisplayInfoMessage("Interaction Requested", outputMessage);
-                }
             }
             
             if(status == TChatMessageStatus.cmsReceived)
