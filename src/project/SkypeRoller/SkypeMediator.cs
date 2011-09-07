@@ -20,12 +20,14 @@ namespace SkypeRoller
 
         private RequestOutputGenerator requestOutputGenerator;
         private RequestCommandParser requestCommandParser;
+        private VersionCommandParser versionCommandParser;
 
         public SkypeMediator()
         {
             diceOutputGenerator = new DiceOutputGenerator(new TotalScoreGenerator());
             rollGenerator = new RollGenerator();
             diceCommandParser = new DiceCommandParser();
+            versionCommandParser = new VersionCommandParser();
 
             requestOutputGenerator = new RequestOutputGenerator();
             requestCommandParser = new RequestCommandParser();
@@ -47,9 +49,19 @@ namespace SkypeRoller
 
         protected void StartSkypeAndHooks()
         {
-            skype = new Skype();
+            try { skype = new Skype(); }
+            catch (Exception ex)
+            {
+                var title = "Skype Binding Error";
+                var message = "Unable to use Skype4Com component, this could be due to Extras Manager not being available or Skype not configured for addons. Do you want to see debug output?";
+                if(MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                { MessageBox.Show(ex.ToString(), "Debug Information", MessageBoxButtons.OK); }
+                Program.RollerTrayForm.CloseApplication();
+            }
+
             if (!skype.Client.IsRunning)
             { skype.Client.Start(); }
+
             skype.MessageStatus += skype_MessageStatus;
         }
 
@@ -63,23 +75,45 @@ namespace SkypeRoller
         {
             if (status == TChatMessageStatus.cmsSending)
             {
-                if (diceCommandParser.IsMatchingCommand(message.Body))
+                CheckForDiceCommands(message);
+                CheckForVersionCommands(message);
+                CheckForRequestCommands(message);
+            }
+            
+            if(status == TChatMessageStatus.cmsReceived)
+            {
+                CheckForRequestCommands(message);
+            }
+        }
+
+        private void CheckForDiceCommands(ChatMessage message)
+        {
+            if (diceCommandParser.IsMatchingCommand(message.Body))
                 {
                     var diceCommand = diceCommandParser.ParseCommandFromMessage(message.Body, message.FromDisplayName);
                     var diceResults = rollGenerator.GenerateRollResults(diceCommand);
                     var outputMessage = diceOutputGenerator.GenerateOutputMessage(diceResults);
                     message.Chat.SendMessage(outputMessage);
                 }
-            }
-            
-            if(status == TChatMessageStatus.cmsReceived)
+        }
+
+        private void CheckForVersionCommands(ChatMessage message)
+        {
+            if (versionCommandParser.IsMatchingCommand(message.Body))
             {
-                if(requestCommandParser.IsMatchingCommand(message.Body))
-                {
-                    var requestCommand = requestCommandParser.ParseCommandFromMessage(message.Body, message.FromDisplayName);
-                    var outputMessage = requestOutputGenerator.GenerateOutputMessage(requestCommand);
-                    Program.RollerTrayForm.DisplayInfoMessage("Interaction Requested", outputMessage);
-                }
+                var currentVersion = GetType().Assembly.GetName().Version;
+                var versionInfo = string.Format("Currently Running SkypeRoller Version: {0}", currentVersion);
+                message.Chat.SendMessage(versionInfo);
+            }
+        }
+
+        private void CheckForRequestCommands(ChatMessage message)
+        {
+            if (requestCommandParser.IsMatchingCommand(message.Body))
+            {
+                var requestCommand = requestCommandParser.ParseCommandFromMessage(message.Body, message.FromDisplayName);
+                var outputMessage = requestOutputGenerator.GenerateOutputMessage(requestCommand);
+                Program.RollerTrayForm.DisplayInfoMessage("Interaction Requested", outputMessage);
             }
         }
 

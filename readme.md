@@ -6,9 +6,22 @@ The dice commands should be entered like so:
 
 //1d6 or //2d8+5 or even //10d100-25
 
+You can also make requests of other players to alert them to something they need to action
+
+//Request Perception Check
+
+Would raise an alert to each client running the roller that they need to make a perception check
+
+//Version
+
+Would output the current running version
+
+
 ## Setup
 
 Download the current SkypeRoller build and run the executable contained, or download the project and compile, then run the resulting exe file.
+
+Due to Skype removing the extras manager in later versions, you may get runtime issues if it is not installed, we recommend using skype version 4.2
 
 ## Development
 
